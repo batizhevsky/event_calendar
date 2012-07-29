@@ -254,7 +254,12 @@ module EventCalendar
                   cal << block.call({:event => event, :day => day.to_date, :options => options})
                 else
                   # default content in case nothing is passed in
-                  cal << %(<a href="/#{class_name.pluralize}/#{event.id}" title="#{h(event.name)}">#{h(event.name)}</a>)
+                  #show user in event if exist
+                  if event.user
+                    cal << %(<a href="/#{class_name.pluralize}/#{event.id}" title="#{h(event.name)} - #{h(event.user)}">#{h(event.name)} - #{h(event.user)}</a>)
+                  else
+                    cal << %(<a href="/#{class_name.pluralize}/#{event.id}" title="#{h(event.name)}">#{h(event.name)}</a>)
+                  end
                 end
 
                 cal << %(</div></td>)

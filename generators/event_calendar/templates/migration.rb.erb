@@ -5,6 +5,9 @@ class Create<%= class_name.classify.pluralize %> < ActiveRecord::Migration
       t.datetime :start_at
       t.datetime :end_at
       <%- if options[:use_all_day] -%>
+      t.integer :user_id
+      <%- end -%>
+      <%- if options[:use_all_day] -%>
       t.boolean :all_day
       <%- end -%>
 

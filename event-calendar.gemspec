@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jeff Schuil"]
-  s.date = %q{2011-03-03}
+  s.date = %q{2012-03-03}
   s.description = %q{Rails helper for showing multiple, overlapping events across calendar days and rows.}
   s.email = %q{}
   s.extra_rdoc_files = [
