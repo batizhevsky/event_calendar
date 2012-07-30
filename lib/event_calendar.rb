@@ -62,23 +62,21 @@ module EventCalendar
       events.each do |e|
         if e.repeat
           case e.repeat
-            when DAY
-              ev = e.dup
-              dub_events = []
-              while ev.start_at < start_d.to_time.utc 
-                ev.start_at += 1.day
-                ev.end_at += 1.day
-                dub_events.push ev
-              end
-              events + dub_events
-              end
-            when WEEK
-              self[:repeat] = EventHelper::WEEK
-            when MONTH 
-              self[:repeat] = EventHelper::MONTH
-            when YEAR
-              self[:repeat] = EventHelper::YEAR
+          when DAY
+            ev = e.dup
+            dub_events = []
+            while ev.start_at < end_d.to_time.utc 
+              ev.start_at += 1.day
+              ev.end_at += 1.day
+              dub_events.push ev
             end
+            events += dub_events
+          when WEEK
+            self[:repeat] = WEEK
+          when MONTH 
+            self[:repeat] = MONTH
+          when YEAR
+            self[:repeat] = YEAR
           end
         end
       end
