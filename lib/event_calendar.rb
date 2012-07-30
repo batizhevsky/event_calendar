@@ -5,7 +5,10 @@ module EventCalendar
   end
 
   module ClassMethods
-
+    DAY = 1
+    WEEK = 2
+    MONTH = 3
+    YEAR = 4
     def has_event_calendar(options={})
       cattr_accessor :start_at_field, :end_at_field 
       self.start_at_field = ( options[:start_at_field] ||= :start_at).to_s
@@ -49,34 +52,58 @@ module EventCalendar
     
     # Get the events overlapping the given start and end dates
     def events_for_date_range(start_d, end_d, find_options = {})
-      puts '+' * 1000
-      DAY = 1
-      WEEK = 2
-      MONTH = 3
-      YEAR = 4
       events = self.scoped(find_options).find(
         :all,
-        :conditions => [ "(? <= #{self.quoted_table_name}.#{self.end_at_field}) AND (#{self.quoted_table_name}.#{self.start_at_field}< ?)", start_d.to_time.utc, end_d.to_time.utc ],
+        # :conditions => [ "(? <= #{self.quoted_table_name}.#{self.end_at_field}) AND (#{self.quoted_table_name}.#{self.start_at_field}< ?)", start_d.to_time.utc, end_d.to_time.utc ],
         :order => "#{self.quoted_table_name}.#{self.start_at_field} ASC"
       )
       events.each do |e|
         if e.repeat
           case e.repeat
-          when DAY
-            ev = e.dup
+          when DAY    
             dub_events = []
-            while ev.start_at < end_d.to_time.utc 
+            last_object = e
+            while last_object.start_at < end_d.to_time.utc 
+              ev = last_object.dup
               ev.start_at += 1.day
               ev.end_at += 1.day
+              last_object = ev
               dub_events.push ev
             end
             events += dub_events
           when WEEK
-            self[:repeat] = WEEK
+            dub_events = []
+            last_object = e
+            while last_object.start_at < end_d.to_time.utc 
+              ev = last_object.dup
+              ev.start_at += 1.week
+              ev.end_at += 1.week
+              last_object = ev
+              dub_events.push ev
+            end
+            events += dub_events
           when MONTH 
-            self[:repeat] = MONTH
+            dub_events = []
+            last_object = e
+            while last_object.start_at < end_d.to_time.utc 
+              ev = last_object.dup
+              ev.start_at += 1.month
+              ev.end_at += 1.month
+              last_object = ev
+              dub_events.push ev
+            end
+            events += dub_events
           when YEAR
-            self[:repeat] = YEAR
+            dub_events = []
+            last_object = e
+            while last_object.start_at < end_d.to_time.utc 
+              ev = last_object.dup
+              ev.start_at += 1.month
+              ev.end_at += 1.month
+              last_object = ev
+              dub_events.push ev
+            end
+            events += dub_events
           end
         end
       end
@@ -87,7 +114,9 @@ module EventCalendar
     def create_event_strips(strip_start, strip_end, events)
       # create an inital event strip, with a nil entry for every day of the displayed days
       event_strips = [[nil] * (strip_end - strip_start + 1)]
-    
+      puts '----'
+      puts 'strip'
+      puts events.inspect
       events.each do |event|
         cur_date = event.start_at.to_date
         end_date = event.end_at.to_date
@@ -112,6 +141,8 @@ module EventCalendar
           end
         end
       end
+      puts 'out of create_event_strips'
+      puts event_strips.inspect
       event_strips
     end
     
