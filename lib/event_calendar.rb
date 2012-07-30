@@ -49,11 +49,40 @@ module EventCalendar
     
     # Get the events overlapping the given start and end dates
     def events_for_date_range(start_d, end_d, find_options = {})
-      self.scoped(find_options).find(
+      puts '+' * 1000
+      DAY = 1
+      WEEK = 2
+      MONTH = 3
+      YEAR = 4
+      events = self.scoped(find_options).find(
         :all,
         :conditions => [ "(? <= #{self.quoted_table_name}.#{self.end_at_field}) AND (#{self.quoted_table_name}.#{self.start_at_field}< ?)", start_d.to_time.utc, end_d.to_time.utc ],
         :order => "#{self.quoted_table_name}.#{self.start_at_field} ASC"
       )
+      events.each do |e|
+        if e.repeat
+          case e.repeat
+            when DAY
+              ev = e.dup
+              dub_events = []
+              while ev.start_at < start_d.to_time.utc 
+                ev.start_at += 1.day
+                ev.end_at += 1.day
+                dub_events.push ev
+              end
+              events + dub_events
+              end
+            when WEEK
+              self[:repeat] = EventHelper::WEEK
+            when MONTH 
+              self[:repeat] = EventHelper::MONTH
+            when YEAR
+              self[:repeat] = EventHelper::YEAR
+            end
+          end
+        end
+      end
+
     end
     
     # Create the various strips that show events.
