@@ -107,16 +107,13 @@ module EventCalendar
           end
         end
       end
-
+      events
     end
     
     # Create the various strips that show events.
     def create_event_strips(strip_start, strip_end, events)
       # create an inital event strip, with a nil entry for every day of the displayed days
       event_strips = [[nil] * (strip_end - strip_start + 1)]
-      puts '----'
-      puts 'strip'
-      puts events.inspect
       events.each do |event|
         cur_date = event.start_at.to_date
         end_date = event.end_at.to_date
@@ -141,8 +138,6 @@ module EventCalendar
           end
         end
       end
-      puts 'out of create_event_strips'
-      puts event_strips.inspect
       event_strips
     end
     
